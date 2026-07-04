@@ -1,0 +1,18 @@
+# БД
+neo4j>=5.20
+
+# Бэкенд
+fastapi>=0.110
+uvicorn[standard]>=0.29
+pydantic>=2.6
+
+# LLM (ключ в переменной окружения ANTHROPIC_API_KEY)
+anthropic>=0.50
+
+# Канонизация имён сущностей
+pymorphy3>=2.0
+pymorphy3-dicts-ru
+
+# Эмбеддинги BAAI/bge-m3 (тянет torch; модель ~2.3 ГБ скачается при первом запуске)
+sentence-transformers>=3.0
+numpy

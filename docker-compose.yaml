@@ -1,0 +1,19 @@
+services:
+  neo4j:
+    image: neo4j:5
+    container_name: nornickel-neo4j
+    restart: unless-stopped
+    environment:
+      NEO4J_AUTH: neo4j/neo4jpass
+      NEO4J_PLUGINS: '["apoc"]'
+      NEO4J_server_memory_heap_initial__size: 512m
+      NEO4J_server_memory_heap_max__size: 1g
+    ports:
+      - "7475:7474"
+      - "7688:7687"
+    volumes:
+      - nornickel_neo4jdata:/data
+
+volumes:
+  nornickel_neo4jdata:
+    name: rag_nornickel_neo4jdata
