@@ -14,8 +14,9 @@ export function EmptyState({ onSend, loading }: Props) {
         Это граф <span className="accent-underline">знаний</span>!
       </h1>
       <p>
-        Отвечаем на вопросы по металлургии и показываем, откуда взят ответ —
-        вершины графа и статьи-источники.
+        Отвечаем на вопросы по металлургии и показываем,
+        <br />
+        откуда взят ответ – вершины графа и статьи-источники
       </p>
 
       <ChatInput onSend={onSend} loading={loading} large />
