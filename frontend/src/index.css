@@ -52,8 +52,6 @@ body {
   border-width: 1.5px;
 }
 
-/* ---------- sidebar ---------- */
-
 .app-sidebar {
   width: 264px;
   flex-shrink: 0;
@@ -161,16 +159,12 @@ body {
   color: var(--ink-muted);
 }
 
-/* ---------- main / layout ---------- */
-
 .app-main {
   flex: 1;
   min-height: 0;
   display: flex;
   flex-direction: column;
 }
-
-/* ---------- empty state ---------- */
 
 .empty-state {
   flex: 1;
@@ -208,7 +202,6 @@ body {
   background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20200%2060'%20preserveAspectRatio='none'%3E%3Cpath%20d='M1%2032%20L12%206%20L189%201%20L199%2027%20L187%2054%20L9%2059%20Z'%20fill='%2300FFBF'%20opacity='0.75'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  opacity: 0.75;
 }
 
 .empty-state p {
@@ -283,8 +276,6 @@ body {
   }
 }
 
-/* ---------- chat window ---------- */
-
 .chat-window {
   flex: 1;
   min-height: 0;
@@ -316,15 +307,12 @@ body {
   margin: 0 auto;
 }
 
-/* ---------- bubbles ---------- */
-
 .bubble {
   padding: 12px 16px;
   border-radius: 14px;
   font-size: 14.5px;
   font-weight: 400;
   line-height: 1.6;
-  white-space: pre-wrap;
   max-width: 85%;
 }
 
@@ -333,6 +321,7 @@ body {
   background: var(--violet);
   color: #fff;
   border-bottom-right-radius: 4px;
+  white-space: pre-wrap;
 }
 
 .bubble-assistant-wrap {
@@ -364,6 +353,157 @@ body {
   border-color: var(--danger);
   background: var(--danger-bg);
   color: var(--danger);
+}
+
+.markdown-body > *:first-child {
+  margin-top: 0;
+}
+
+.markdown-body > *:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body p {
+  margin: 0 0 10px;
+}
+
+.markdown-body h1,
+.markdown-body h2,
+.markdown-body h3,
+.markdown-body h4 {
+  color: var(--ink);
+  font-weight: 700;
+  line-height: 1.35;
+  margin: 18px 0 8px;
+}
+
+.markdown-body h1 {
+  font-size: 20px;
+}
+
+.markdown-body h2 {
+  font-size: 18px;
+}
+
+.markdown-body h3 {
+  font-size: 16px;
+}
+
+.markdown-body h4 {
+  font-size: 14.5px;
+}
+
+.markdown-body strong {
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.markdown-body em {
+  font-style: italic;
+}
+
+.markdown-body del {
+  color: var(--ink-muted);
+}
+
+.markdown-body ul,
+.markdown-body ol {
+  margin: 0 0 10px;
+  padding-left: 22px;
+}
+
+.markdown-body li {
+  margin-bottom: 4px;
+}
+
+.markdown-body li > ul,
+.markdown-body li > ol {
+  margin-top: 4px;
+  margin-bottom: 0;
+}
+
+.markdown-body ul.contains-task-list {
+  list-style: none;
+  padding-left: 4px;
+}
+
+.markdown-body li.task-list-item input[type="checkbox"] {
+  margin-right: 6px;
+}
+
+.markdown-body a {
+  color: var(--violet);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.markdown-body a:hover {
+  color: var(--violet-dark);
+}
+
+.markdown-body blockquote {
+  margin: 0 0 10px;
+  padding: 4px 14px;
+  border-left: 3px solid var(--turquoise-dark);
+  background: var(--turquoise-soft);
+  color: var(--ink-muted);
+  border-radius: 0 8px 8px 0;
+}
+
+.markdown-body blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-body code {
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 13px;
+  background: var(--violet-soft);
+  color: var(--violet-dark);
+  padding: 2px 6px;
+  border-radius: 5px;
+}
+
+.markdown-body pre {
+  margin: 0 0 10px;
+  padding: 14px 16px;
+  background: var(--ink);
+  border-radius: 10px;
+  overflow-x: auto;
+}
+
+.markdown-body pre code {
+  background: none;
+  color: #f1f1fb;
+  padding: 0;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.markdown-body hr {
+  border: none;
+  border-top: 1px solid var(--gray-light);
+  margin: 14px 0;
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 0 0 12px;
+  font-size: 13.5px;
+}
+
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid var(--gray-light);
+  padding: 6px 10px;
+  text-align: left;
+}
+
+.markdown-body th {
+  background: var(--bg);
+  color: var(--ink);
+  font-weight: 700;
 }
 
 .bubble-toolbar {
@@ -416,8 +556,6 @@ body {
   gap: 6px;
 }
 
-/* ---------- node chips ---------- */
-
 .node-chips {
   display: flex;
   flex-wrap: wrap;
@@ -444,8 +582,6 @@ body {
   text-transform: uppercase;
   letter-spacing: 0.02em;
 }
-
-/* ---------- sources ---------- */
 
 .source-list {
   display: flex;
@@ -510,8 +646,6 @@ body {
   line-height: 1.55;
 }
 
-/* ---------- chat input ---------- */
-
 .chat-input {
   display: flex;
   align-items: center;
@@ -552,8 +686,6 @@ body {
 .chat-send-btn {
   flex-shrink: 0;
 }
-
-/* ---------- scrollbar ---------- */
 
 .chat-scroll::-webkit-scrollbar,
 .empty-state::-webkit-scrollbar {

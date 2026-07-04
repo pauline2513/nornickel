@@ -17,8 +17,6 @@ export const palette = {
   danger: "#D8483C",
 };
 
-// Мягкие тонированные плашки для типов вершин графа — узнаваемый цвет на
-// спокойном фоне, без "стикерной" заливки на весь чип.
 export const nodeLabelColors: Record<string, { bg: string; border: string; text: string }> = {
   Material: { bg: "#E1FBF2", border: "#8FE4C8", text: "#0E6B52" },
   Process: { bg: "#F1EBFF", border: "#B79CF2", text: "#4A1FA3" },
@@ -60,10 +58,6 @@ export const antdTheme: ThemeConfig = {
       controlHeight: 40,
       fontWeight: 600,
       primaryShadow: "none",
-      // Текст поверх сплошной заливки primary-цветом — бирюзовый слишком
-      // светлый для белого текста, используем тёмно-синий. Скопировано
-      // только на Button: тот же токен управляет текстом в Tooltip/Tag,
-      // и глобальное переопределение делало тёмный текст на тёмном тултипе.
       colorTextLightSolid: palette.ink,
     },
     Input: {

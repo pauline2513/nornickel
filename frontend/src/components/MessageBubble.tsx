@@ -1,6 +1,8 @@
 import { useState } from "react";
 import { Button, Tag, Tooltip } from "antd";
 import { CheckOutlined, CopyOutlined, TagsOutlined } from "@ant-design/icons";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import type { ChatMessage } from "../types";
 import { UsedNodesPanel } from "./UsedNodesPanel";
 import { SourcesPanel } from "./SourcesPanel";
@@ -23,7 +25,13 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
   return (
     <div className={`bubble-assistant-wrap ${isError ? "is-error" : ""}`}>
       <div className={`bubble bubble-assistant ${isError ? "bubble-error" : ""}`}>
-        {message.text}
+        {isError ? (
+          message.text
+        ) : (
+          <div className="markdown-body">
+            <ReactMarkdown remarkPlugins={[remarkGfm]}>{message.text}</ReactMarkdown>
+          </div>
+        )}
       </div>
 
       {!isError && (

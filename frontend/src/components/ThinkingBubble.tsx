@@ -1,8 +1,6 @@
 import { useEffect, useState } from "react";
 import { LoadingOutlined } from "@ant-design/icons";
 
-// Стадии реального пайплайна из backend/rag.py — показываем их вместо
-// абстрактного спиннера, чтобы было видно, что происходит "под капотом".
 const STAGES = [
   "Извлекаю сущности из запроса…",
   "Ищу вершины графа знаний…",

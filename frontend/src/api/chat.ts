@@ -8,8 +8,6 @@ function delay([min, max]: [number, number]) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-// Черновой разбор запроса на "сущности" для демо — просто значимые слова.
-// Реальное извлечение сущностей делает backend/llm.py::extract_query_entities.
 function guessEntities(query: string): string[] {
   const stopWords = new Set(["какой", "какая", "какие", "как", "для", "при", "что", "или", "это"]);
   const words = query
@@ -22,19 +20,6 @@ function guessEntities(query: string): string[] {
 
 let cursor = 0;
 
-/**
- * Заглушка POST /api/chat, пока backend-модель (Graph RAG, backend/rag.py) не готова.
- * Возвращает данные в том же формате, что и реальный эндпоинт — см. README.md.
- *
- * Когда backend будет готов, заменить тело функции на:
- *   const resp = await fetch("/api/chat", {
- *     method: "POST",
- *     headers: { "Content-Type": "application/json" },
- *     body: JSON.stringify({ query }),
- *   });
- *   if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
- *   return resp.json();
- */
 export async function askChat(query: string): Promise<ChatResponse> {
   await delay(MOCK_LATENCY_MS);
 
