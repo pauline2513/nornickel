@@ -17,6 +17,16 @@ export const palette = {
   danger: "#D8483C",
 };
 
+export const nodeLabelRu: Record<string, string> = {
+  Material: "материал",
+  Process: "процесс",
+  Equipment: "оборудование",
+  Property: "свойство",
+  Experiment: "эксперимент",
+  Expert: "эксперт",
+  Facility: "объект",
+};
+
 export const nodeLabelColors: Record<string, { bg: string; border: string; text: string }> = {
   Material: { bg: "#E1FBF2", border: "#8FE4C8", text: "#0E6B52" },
   Process: { bg: "#F1EBFF", border: "#B79CF2", text: "#4A1FA3" },

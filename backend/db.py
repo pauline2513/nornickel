@@ -102,10 +102,29 @@ def fetch_sources(node_ids):
         "       p.source_type AS source_type, p.country AS country, "
         "       p.actualization_date AS actualization_date, "
         "       p.summary AS summary, p.link AS link, "
+        "       [(m)-[:DESCRIBED_IN]->(p) WHERE elementId(m) IN $ids | elementId(m)] AS used_node_ids, "
         "       count { (m)-[:DESCRIBED_IN]->(p) WHERE elementId(m) IN $ids } AS used_nodes_count "
         "ORDER BY used_nodes_count DESC",
         ids=node_ids,
     )
+
+
+def fetch_all_sources():
+    return run(
+        "MATCH (p:Publication) WHERE p.source_file IS NOT NULL "
+        "RETURN p.uid AS uid, p.title AS title, p.year AS year, "
+        "       p.source_type AS source_type, p.country AS country, "
+        "       p.actualization_date AS actualization_date, p.link AS link "
+        "ORDER BY toString(coalesce(p.actualization_date, '')) DESC, p.title ASC"
+    )
+
+
+def fetch_source_file(uid):
+    rows = run(
+        "MATCH (p:Publication {uid: $uid}) RETURN p.source_file AS source_file",
+        uid=uid,
+    )
+    return rows[0]["source_file"] if rows else None
 
 
 def fetch_graph(limit=350, search=""):
@@ -154,6 +173,7 @@ def fetch_graph(limit=350, search=""):
         "  year: p.year, "
         "  source_type: p.source_type, "
         "  country: p.country, "
+        "  actualization_date: p.actualization_date, "
         "  summary: p.summary, "
         "  link: p.link, "
         "  linked_node_ids: linked_node_ids "

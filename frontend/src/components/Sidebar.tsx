@@ -1,5 +1,11 @@
 import { Button } from "antd";
-import { ApartmentOutlined, FilePptOutlined, GithubOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  ApartmentOutlined,
+  DatabaseOutlined,
+  FilePptOutlined,
+  GithubOutlined,
+  PlusOutlined,
+} from "@ant-design/icons";
 import type { ChatConversation } from "../types";
 
 const REPO_URL = "https://github.com/pauline2513/nornickel";
@@ -15,10 +21,11 @@ const REQUEST_DAY_FORMATTER = new Intl.DateTimeFormat("ru-RU", {
 
 interface Props {
   activeConversationId: string | null;
-  activeView: "chat" | "graph";
+  activeView: "chat" | "graph" | "dataset";
   conversations: ChatConversation[];
   onNewChat: () => void;
   onOpenGraph: () => void;
+  onOpenDataset: () => void;
   onSelectConversation: (conversationId: string) => void;
   hasMessages: boolean;
   loading: boolean;
@@ -41,6 +48,7 @@ export function Sidebar({
   conversations,
   onNewChat,
   onOpenGraph,
+  onOpenDataset,
   onSelectConversation,
   hasMessages,
   loading,
@@ -71,6 +79,15 @@ export function Sidebar({
           block
         >
           Граф знаний
+        </Button>
+        <Button
+          className={`sidebar-graph-tab ${activeView === "dataset" ? "sidebar-graph-tab-active" : ""}`}
+          icon={<DatabaseOutlined />}
+          onClick={onOpenDataset}
+          type="text"
+          block
+        >
+          Набор данных
         </Button>
         <div className="sidebar-divider" />
 

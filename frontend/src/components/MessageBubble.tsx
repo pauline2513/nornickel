@@ -4,14 +4,22 @@ import { CheckOutlined, CopyOutlined, TagsOutlined } from "@ant-design/icons";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import type { ChatMessage } from "../types";
-import { UsedNodesPanel } from "./UsedNodesPanel";
 import { SourcesPanel } from "./SourcesPanel";
 
-export function MessageBubble({ message }: { message: ChatMessage }) {
+interface Props {
+  message: ChatMessage;
+  messageRef?: (el: HTMLDivElement | null) => void;
+}
+
+export function MessageBubble({ message, messageRef }: Props) {
   const [copied, setCopied] = useState(false);
 
   if (message.role === "user") {
-    return <div className="bubble bubble-user">{message.text}</div>;
+    return (
+      <div className="bubble bubble-user" ref={messageRef}>
+        {message.text}
+      </div>
+    );
   }
 
   const isError = message.status === "error";
@@ -23,7 +31,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
   }
 
   return (
-    <div className={`bubble-assistant-wrap ${isError ? "is-error" : ""}`}>
+    <div className={`bubble-assistant-wrap ${isError ? "is-error" : ""}`} ref={messageRef}>
       <div className={`bubble bubble-assistant ${isError ? "bubble-error" : ""}`}>
         {isError ? (
           message.text
@@ -59,8 +67,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
 
       {message.data && (
         <div className="meta-stack">
-          <UsedNodesPanel nodes={message.data.used_nodes} />
-          <SourcesPanel sources={message.data.sources} />
+          <SourcesPanel sources={message.data.sources} usedNodes={message.data.used_nodes} />
         </div>
       )}
     </div>

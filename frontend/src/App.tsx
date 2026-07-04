@@ -3,6 +3,7 @@ import { Sidebar } from "./components/Sidebar";
 import { EmptyState } from "./components/EmptyState";
 import { ChatWindow } from "./components/ChatWindow";
 import { GraphView } from "./components/GraphView";
+import { DatasetView } from "./components/DatasetView";
 import { askChat } from "./api/chat";
 import type { ChatConversation, ChatMessage } from "./types";
 
@@ -83,7 +84,7 @@ function App() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(
     () => loadConversations()[0]?.id ?? null,
   );
-  const [activeView, setActiveView] = useState<"chat" | "graph">("chat");
+  const [activeView, setActiveView] = useState<"chat" | "graph" | "dataset">("chat");
   const [loading, setLoading] = useState(false);
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConversationId) ?? null,
@@ -149,6 +150,10 @@ function App() {
     setActiveView("graph");
   }
 
+  function handleOpenDataset() {
+    setActiveView("dataset");
+  }
+
   return (
     <div className="app-shell">
       <Sidebar
@@ -157,6 +162,7 @@ function App() {
         activeView={activeView}
         onNewChat={handleNewChat}
         onOpenGraph={handleOpenGraph}
+        onOpenDataset={handleOpenDataset}
         onSelectConversation={handleSelectConversation}
         hasMessages={messages.length > 0}
         loading={loading}
@@ -164,6 +170,8 @@ function App() {
       <main className="app-main">
         {activeView === "graph" ? (
           <GraphView />
+        ) : activeView === "dataset" ? (
+          <DatasetView />
         ) : messages.length === 0 ? (
           <EmptyState onSend={handleSend} loading={loading} />
         ) : (

@@ -12,6 +12,8 @@ export interface UsedNode {
   label: NodeLabel;
   name: string;
   text?: string | null;
+  start?: number | null;
+  end?: number | null;
   score: number;
 }
 
@@ -21,9 +23,29 @@ export interface Source {
   year?: number | null;
   source_type?: string | null;
   country?: string | null;
+  actualization_date?: string | number | null;
   summary?: string | null;
   link?: string | null;
+  used_node_ids?: string[];
   used_nodes_count: number;
+}
+
+export interface SourceTextResponse {
+  text: string;
+}
+
+export interface DatasetSource {
+  uid: string;
+  title: string;
+  year?: number | null;
+  source_type?: string | null;
+  country?: string | null;
+  actualization_date?: string | number | null;
+  link?: string | null;
+}
+
+export interface DatasetResponse {
+  sources: DatasetSource[];
 }
 
 export interface ChatResponse {
@@ -73,6 +95,7 @@ export interface GraphSource {
   year?: number | null;
   source_type?: string | null;
   country?: string | null;
+  actualization_date?: string | number | null;
   summary?: string | null;
   link?: string | null;
   linked_node_ids: string[];

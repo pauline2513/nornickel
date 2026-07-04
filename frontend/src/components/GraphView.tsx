@@ -294,7 +294,9 @@ function SourceList({ sources, compact = false }: { sources: GraphSource[]; comp
 	          <div className="graph-source-tags">
 	            {source.source_type && <Tag>{source.source_type}</Tag>}
 	            {source.country && <Tag className="graph-source-tag-meta">{source.country}</Tag>}
-	            {source.year && <Tag className="graph-source-tag-meta">{source.year}</Tag>}
+	            {(source.year ?? source.actualization_date) != null && (
+              <Tag className="graph-source-tag-meta">{source.year ?? source.actualization_date}</Tag>
+            )}
 	          </div>
           {!compact && source.summary && <p>{source.summary}</p>}
           {source.link && (

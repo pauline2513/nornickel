@@ -1,4 +1,4 @@
-import type { ChatResponse } from "../types";
+import type { ChatResponse, SourceTextResponse } from "../types";
 
 export async function askChat(query: string): Promise<ChatResponse> {
   const trimmedQuery = query.trim();
@@ -35,4 +35,28 @@ export async function askChat(query: string): Promise<ChatResponse> {
   }
 
   return (await response.json()) as ChatResponse;
+}
+
+export async function fetchSourceText(uid: string): Promise<SourceTextResponse> {
+  let response: Response;
+  try {
+    response = await fetch(`/api/sources/${encodeURIComponent(uid)}/text`);
+  } catch {
+    throw new Error("Не удалось подключиться к backend.");
+  }
+
+  if (!response.ok) {
+    let message = `Backend вернул ошибку ${response.status}`;
+    try {
+      const errorBody = await response.json();
+      if (typeof errorBody?.detail === "string" && errorBody.detail.trim()) {
+        message = errorBody.detail;
+      }
+    } catch {
+      // If backend returned a non-JSON error, keep the status-based message.
+    }
+    throw new Error(message);
+  }
+
+  return (await response.json()) as SourceTextResponse;
 }
