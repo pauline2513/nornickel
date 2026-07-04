@@ -22,8 +22,12 @@
 │   └── scripts/
 │       ├── ingest.py          загрузка *.pred.json в Neo4j
 │       └── enrich_sources.py  суммаризация источников (пишет Publication.summary)
-└── frontend/
-    └── index.html             чат (вершины — цветные чипсы по типу, источники — списком)
+└── frontend/                  React + TypeScript + antd (Vite), см. frontend/README.md
+    ├── src/
+    │   ├── api/chat.ts         вызов /api/chat — сейчас заглушка с mock-данными
+    │   ├── components/         чат: пустой экран, пузыри сообщений, чипы вершин, источники
+    │   └── App.tsx
+    └── dist/                  production-сборка (npm run build), её раздаёт backend/main.py
 ```
 
 ## Запуск
@@ -44,10 +48,35 @@ python -m backend.scripts.ingest "Проблемы_выделения_элеме
 # 5. (опционально) суммаризация источников — .txt должны лежать в data/
 python -m backend.scripts.enrich_sources
 
-# 6. Бэкенд + фронтенд
+# 6. Фронтенд: сборка (или см. ниже режим разработки)
+cd frontend
+npm install
+npm run build
+cd ..
+
+# 7. Бэкенд + собранный фронтенд
 uvicorn backend.main:app --reload
 # открыть http://localhost:8000
 ```
+
+### Фронтенд в режиме разработки
+
+Backend-модель (Graph RAG) пока не готова полностью, поэтому чат-эндпоинт на
+фронтенде замокан (`frontend/src/api/chat.ts`) — раздаёт заготовленные
+ответы в том же формате, что и реальный `/api/chat`. Это позволяет
+разрабатывать и демонстрировать интерфейс независимо от backend:
+
+```powershell
+cd frontend
+npm install
+npm run dev
+# открыть http://localhost:5173
+```
+
+Когда backend-модель будет готова, в `frontend/src/api/chat.ts` нужно
+заменить тело `askChat()` на реальный `fetch("/api/chat", …)` — комментарий
+с готовым кодом уже есть в файле. Dev-сервер Vite уже настроен проксировать
+`/api/*` на `http://localhost:8000`.
 
 ## Как работает RAG (backend/rag.py)
 

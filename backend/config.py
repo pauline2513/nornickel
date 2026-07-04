@@ -4,7 +4,7 @@ from pathlib import Path
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data"
 SCHEMA_FILE = PROJECT_ROOT / "schema.cypher"
-FRONTEND_DIR = PROJECT_ROOT / "frontend"
+FRONTEND_DIR = PROJECT_ROOT / "frontend" / "dist"  # собирается: cd frontend && npm run build
 
 # Neo4j
 NEO4J_URI = os.getenv("NEO4J_URI", "bolt://localhost:7688")
