@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Sidebar } from "./components/Sidebar";
 import { EmptyState } from "./components/EmptyState";
 import { ChatWindow } from "./components/ChatWindow";
+import { GraphView } from "./components/GraphView";
 import { askChat } from "./api/chat";
 import type { ChatConversation, ChatMessage } from "./types";
 
@@ -82,6 +83,7 @@ function App() {
   const [activeConversationId, setActiveConversationId] = useState<string | null>(
     () => loadConversations()[0]?.id ?? null,
   );
+  const [activeView, setActiveView] = useState<"chat" | "graph">("chat");
   const [loading, setLoading] = useState(false);
   const activeConversation = useMemo(
     () => conversations.find((conversation) => conversation.id === activeConversationId) ?? null,
@@ -133,12 +135,18 @@ function App() {
 
   function handleNewChat() {
     setActiveConversationId(null);
+    setActiveView("chat");
   }
 
   function handleSelectConversation(conversationId: string) {
     if (!loading) {
       setActiveConversationId(conversationId);
+      setActiveView("chat");
     }
+  }
+
+  function handleOpenGraph() {
+    setActiveView("graph");
   }
 
   return (
@@ -146,13 +154,17 @@ function App() {
       <Sidebar
         activeConversationId={activeConversationId}
         conversations={conversations}
+        activeView={activeView}
         onNewChat={handleNewChat}
+        onOpenGraph={handleOpenGraph}
         onSelectConversation={handleSelectConversation}
         hasMessages={messages.length > 0}
         loading={loading}
       />
       <main className="app-main">
-        {messages.length === 0 ? (
+        {activeView === "graph" ? (
+          <GraphView />
+        ) : messages.length === 0 ? (
           <EmptyState onSend={handleSend} loading={loading} />
         ) : (
           <ChatWindow messages={messages} loading={loading} onSend={handleSend} />

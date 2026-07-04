@@ -96,3 +96,62 @@ def fetch_sources(node_ids):
         "ORDER BY used_nodes_count DESC",
         ids=node_ids,
     )
+
+
+def fetch_graph(limit=350, search=""):
+    search = (search or "").strip().lower()
+    result = run(
+        "MATCH (seed) "
+        "WHERE NOT seed:Chunk AND NOT seed:Publication "
+        "  AND ("
+        "    $search = '' "
+        "    OR toLower(coalesce(seed.name, seed.text, seed.uid, '')) CONTAINS $search "
+        "  ) "
+        "MATCH (seed)-[seed_rel]-(neighbor) "
+        "WHERE NOT neighbor:Chunk AND NOT neighbor:Publication "
+        "WITH seed, count(DISTINCT neighbor) AS connectivity "
+        "ORDER BY connectivity DESC, coalesce(seed.name, seed.text, seed.uid) ASC "
+        "LIMIT $seed_limit "
+        "WITH collect(seed) AS seeds "
+        "MATCH (seed)-[r]-(neighbor) "
+        "WHERE seed IN seeds AND NOT neighbor:Chunk AND NOT neighbor:Publication "
+        "WITH collect(DISTINCT seed) + collect(DISTINCT neighbor) AS raw_nodes, "
+        "     collect(DISTINCT r) AS raw_rels "
+        "UNWIND raw_nodes AS node "
+        "WITH collect(DISTINCT node)[0..$limit] AS nodes, raw_rels "
+        "WITH nodes, [rel IN raw_rels WHERE startNode(rel) IN nodes AND endNode(rel) IN nodes] AS rels "
+        "UNWIND nodes AS source_node "
+        "OPTIONAL MATCH (source_node)-[:DESCRIBED_IN]->(p:Publication) "
+        "WHERE p.source_file IS NOT NULL "
+        "WITH nodes, rels, p, collect(DISTINCT elementId(source_node)) AS linked_node_ids "
+        "ORDER BY size(linked_node_ids) DESC, coalesce(p.year, 0) DESC, coalesce(p.title, '') ASC "
+        "RETURN [node IN nodes | { "
+        "  id: elementId(node), "
+        "  label: labels(node)[0], "
+        "  labels: labels(node), "
+        "  name: coalesce(node.name, node.text, node.uid, 'Без названия'), "
+        "  text: node.text "
+        "}] AS nodes, "
+        "[rel IN rels WHERE rel IS NOT NULL | { "
+        "  id: elementId(rel), "
+        "  source: elementId(startNode(rel)), "
+        "  target: elementId(endNode(rel)), "
+        "  type: type(rel) "
+        "}] AS relationships, "
+        "[source IN collect({ "
+        "  uid: p.uid, "
+        "  title: p.title, "
+        "  year: p.year, "
+        "  source_type: p.source_type, "
+        "  country: p.country, "
+        "  summary: p.summary, "
+        "  link: p.link, "
+        "  linked_node_ids: linked_node_ids "
+        "}) WHERE source.uid IS NOT NULL] AS sources",
+        limit=limit,
+        seed_limit=max(10, limit // 2),
+        search=search,
+    )
+    if not result:
+        return {"nodes": [], "relationships": [], "sources": []}
+    return result[0]

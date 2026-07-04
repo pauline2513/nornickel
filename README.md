@@ -62,7 +62,6 @@ MODEL_API_KEY=...
 # Запасная LLM (используется при недоступности основной)
 FALLBACK_MODEL_NAME=...
 FALLBACK_API_KEY=...
-FALLBACK_BASE_URL=https://openrouter.ai/api/v1   # если запасная не на OpenRouter — поменять
 
 # Эмбеддинги Yandex (при недоступности — локальная BAAI/bge-m3)
 EMBEDDING_MODEL_NAME=emb://<folder_id>/text-search-doc/latest
@@ -79,6 +78,7 @@ docker compose up -d --build
 ```
 
 Первый запуск делает всё сам (5–15 минут, только в первый раз):
+
 - сборка образа: фронтенд (npm), python-зависимости (fastapi, neo4j, openai,
   torch CPU, sentence-transformers — из `requirements-docker.txt` и `Dockerfile`);
 - старт Neo4j (данные — в volume `rag_nornickel_neo4jdata`);
@@ -171,9 +171,26 @@ npm run dev
   "answer": "...",
   "entities": ["элементарная сера", "..."],
   "expansions": 1,
-  "used_nodes": [{"id": "...", "label": "Material", "name": "сера", "text": null, "score": 0.83}],
-  "sources":    [{"uid": "...", "title": "...", "year": null, "source_type": null,
-                  "country": null, "summary": "...", "used_nodes_count": 7}]
+  "used_nodes": [
+    {
+      "id": "...",
+      "label": "Material",
+      "name": "сера",
+      "text": null,
+      "score": 0.83
+    }
+  ],
+  "sources": [
+    {
+      "uid": "...",
+      "title": "...",
+      "year": null,
+      "source_type": null,
+      "country": null,
+      "summary": "...",
+      "used_nodes_count": 7
+    }
+  ]
 }
 ```
 

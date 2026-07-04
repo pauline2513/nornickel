@@ -25,6 +25,7 @@ export const nodeLabelColors: Record<string, { bg: string; border: string; text:
   Experiment: { bg: "#E5F1FF", border: "#9CC5F5", text: "#14538F" },
   Expert: { bg: "#FFEDE8", border: "#F0AF9B", text: "#B23A20" },
   Facility: { bg: "#ECEDF2", border: "#C7CBD8", text: "#3E4759" },
+  Publication: { bg: "#FFF8D8", border: "#E7D06B", text: "#75620B" },
 };
 
 const FONT_FAMILY = '"Inter", -apple-system, "Segoe UI", Roboto, sans-serif';

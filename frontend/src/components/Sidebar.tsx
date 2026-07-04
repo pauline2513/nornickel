@@ -1,5 +1,5 @@
 import { Button } from "antd";
-import { FilePptOutlined, GithubOutlined, PlusOutlined } from "@ant-design/icons";
+import { ApartmentOutlined, FilePptOutlined, GithubOutlined, PlusOutlined } from "@ant-design/icons";
 import type { ChatConversation } from "../types";
 
 const REPO_URL = "https://github.com/pauline2513/nornickel";
@@ -15,8 +15,10 @@ const REQUEST_DAY_FORMATTER = new Intl.DateTimeFormat("ru-RU", {
 
 interface Props {
   activeConversationId: string | null;
+  activeView: "chat" | "graph";
   conversations: ChatConversation[];
   onNewChat: () => void;
+  onOpenGraph: () => void;
   onSelectConversation: (conversationId: string) => void;
   hasMessages: boolean;
   loading: boolean;
@@ -35,8 +37,10 @@ function formatRequestDate(timestamp: number) {
 
 export function Sidebar({
   activeConversationId,
+  activeView,
   conversations,
   onNewChat,
+  onOpenGraph,
   onSelectConversation,
   hasMessages,
   loading,
@@ -57,22 +61,36 @@ export function Sidebar({
         <span className="sidebar-track-badge">Трек «Научный клубок»</span>
       </div>
 
-      <Button
-        className="sidebar-new-chat"
-        icon={<PlusOutlined />}
-        onClick={onNewChat}
-        disabled={!hasMessages || loading}
-        block
-      >
-        Новый диалог
-      </Button>
+      <div className="sidebar-navigation">
+        <div className="sidebar-divider" />
+        <Button
+          className={`sidebar-graph-tab ${activeView === "graph" ? "sidebar-graph-tab-active" : ""}`}
+          icon={<ApartmentOutlined />}
+          onClick={onOpenGraph}
+          type="text"
+          block
+        >
+          Граф знаний
+        </Button>
+        <div className="sidebar-divider" />
+
+        <Button
+          className="sidebar-new-chat"
+          icon={<PlusOutlined />}
+          onClick={onNewChat}
+          disabled={!hasMessages || loading}
+          block
+        >
+          Новый диалог
+        </Button>
+      </div>
 
       {conversations.length > 0 && (
         <div className="sidebar-history" aria-label="История диалогов">
           {conversations.map((conversation) => (
             <button
               className={`sidebar-history-item ${
-                conversation.id === activeConversationId ? "sidebar-history-item-active" : ""
+                activeView === "chat" && conversation.id === activeConversationId ? "sidebar-history-item-active" : ""
               }`}
               disabled={loading}
               key={conversation.id}

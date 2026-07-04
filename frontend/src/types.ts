@@ -51,3 +51,35 @@ export interface ChatConversation {
   lastRequestAt: number;
   updatedAt: number;
 }
+
+export interface GraphNode {
+  id: string;
+  label: NodeLabel;
+  labels: string[];
+  name: string;
+  text?: string | null;
+}
+
+export interface GraphRelationship {
+  id: string;
+  source: string;
+  target: string;
+  type: string;
+}
+
+export interface GraphSource {
+  uid: string;
+  title: string;
+  year?: number | null;
+  source_type?: string | null;
+  country?: string | null;
+  summary?: string | null;
+  link?: string | null;
+  linked_node_ids: string[];
+}
+
+export interface GraphResponse {
+  nodes: GraphNode[];
+  relationships: GraphRelationship[];
+  sources: GraphSource[];
+}

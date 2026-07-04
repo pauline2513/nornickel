@@ -152,7 +152,7 @@ def main():
     db.apply_schema()
     for path in paths:
         docs = json.loads(path.read_text(encoding="utf-8"))
-        print(len(docs))
+
         for doc in docs:
             stats = ingest_document(doc)
             print(f"[ok] {stats['source']}: вершин {stats['nodes']}, "

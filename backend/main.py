@@ -1,6 +1,6 @@
 import logging
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
@@ -34,5 +34,18 @@ def health() -> dict:
 
     nodes = db.run("MATCH (n) RETURN count(n) AS c")[0]["c"]
     return {"status": "ok", "nodes_in_graph": nodes}
+
+
+@app.get("/api/graph")
+def graph(
+    limit: int = Query(default=350, ge=20, le=1000),
+    search: str = "",
+) -> dict:
+    from . import db
+
+    return db.fetch_graph(
+        limit=limit,
+        search=search,
+    )
 
 app.mount("/", StaticFiles(directory=config.FRONTEND_DIR, html=True), name="frontend")
