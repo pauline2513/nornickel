@@ -1,40 +1,52 @@
 import { Button } from "antd";
 import { FilePptOutlined, GithubOutlined, PlusOutlined } from "@ant-design/icons";
+import type { ChatConversation } from "../types";
 
 const REPO_URL = "https://github.com/pauline2513/nornickel";
 const PITCH_URL = "#";
+const REQUEST_TIME_FORMATTER = new Intl.DateTimeFormat("ru-RU", {
+  hour: "2-digit",
+  minute: "2-digit",
+});
+const REQUEST_DAY_FORMATTER = new Intl.DateTimeFormat("ru-RU", {
+  day: "2-digit",
+  month: "2-digit",
+});
 
 interface Props {
+  activeConversationId: string | null;
+  conversations: ChatConversation[];
   onNewChat: () => void;
+  onSelectConversation: (conversationId: string) => void;
   hasMessages: boolean;
   loading: boolean;
 }
 
-function GraphMark() {
-  return (
-    <svg width="34" height="34" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" rx="9" fill="var(--violet)" />
-      <path
-        d="M11 12 L21 21 M11 12 L22 10"
-        stroke="#fff"
-        strokeWidth="1.4"
-        opacity="0.7"
-        strokeLinecap="round"
-      />
-      <circle cx="11" cy="12" r="3.2" fill="#fff" />
-      <circle cx="22" cy="10" r="2.4" fill="#fff" opacity="0.9" />
-      <circle cx="21" cy="21" r="3.6" fill="#fff" />
-    </svg>
-  );
+function formatRequestDate(timestamp: number) {
+  const requestDate = new Date(timestamp);
+  const today = new Date();
+  const isToday =
+    requestDate.getFullYear() === today.getFullYear() &&
+    requestDate.getMonth() === today.getMonth() &&
+    requestDate.getDate() === today.getDate();
+
+  return isToday ? REQUEST_TIME_FORMATTER.format(requestDate) : REQUEST_DAY_FORMATTER.format(requestDate);
 }
 
-export function Sidebar({ onNewChat, hasMessages, loading }: Props) {
+export function Sidebar({
+  activeConversationId,
+  conversations,
+  onNewChat,
+  onSelectConversation,
+  hasMessages,
+  loading,
+}: Props) {
   return (
     <aside className="app-sidebar">
       <div className="sidebar-header">
         <div className="sidebar-brand">
           <button className="sidebar-mark" onClick={onNewChat} type="button" aria-label="Новый диалог">
-            <GraphMark />
+            <img className="sidebar-mark-image" src="/nornickel-hackathon-favicon.ico" alt="" />
           </button>
           <div className="sidebar-hackathon-title" aria-label="Норникель AI Science Hack">
             <span>Норникель</span>
@@ -54,6 +66,28 @@ export function Sidebar({ onNewChat, hasMessages, loading }: Props) {
       >
         Новый диалог
       </Button>
+
+      {conversations.length > 0 && (
+        <div className="sidebar-history" aria-label="История диалогов">
+          {conversations.map((conversation) => (
+            <button
+              className={`sidebar-history-item ${
+                conversation.id === activeConversationId ? "sidebar-history-item-active" : ""
+              }`}
+              disabled={loading}
+              key={conversation.id}
+              onClick={() => onSelectConversation(conversation.id)}
+              title={conversation.title}
+              type="button"
+            >
+              <span className="sidebar-history-text">
+                <span className="sidebar-history-title">{conversation.title}</span>
+                <span className="sidebar-history-date">{formatRequestDate(conversation.lastRequestAt)}</span>
+              </span>
+            </button>
+          ))}
+        </div>
+      )}
 
       <div className="sidebar-spacer" />
 

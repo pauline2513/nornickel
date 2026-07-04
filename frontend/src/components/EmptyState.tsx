@@ -1,6 +1,12 @@
 import { BulbOutlined } from "@ant-design/icons";
 import { ChatInput } from "./ChatInput";
-import { SUGGESTED_PROMPTS } from "../api/mockData";
+
+const SUGGESTED_PROMPTS = [
+  "Для чего в основном потребляется хлорное железо?",
+  "На какой глубине добыча считается сверхглубокой?",
+  "Какой продукт лития наиболее широко используется среди соединений лития?",
+  "Какие два способа переработки медных шлаков широко применяют в промышленной практике?",
+];
 
 interface Props {
   onSend: (query: string) => void;

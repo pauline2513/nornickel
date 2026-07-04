@@ -43,3 +43,11 @@ export interface ChatMessage {
   status?: MessageStatus;
   data?: ChatResponse;
 }
+
+export interface ChatConversation {
+  id: string;
+  title: string;
+  messages: ChatMessage[];
+  lastRequestAt: number;
+  updatedAt: number;
+}
