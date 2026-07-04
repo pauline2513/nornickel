@@ -1,4 +1,4 @@
-import { ApartmentOutlined, BulbOutlined } from "@ant-design/icons";
+import { BulbOutlined } from "@ant-design/icons";
 import { ChatInput } from "./ChatInput";
 import { SUGGESTED_PROMPTS } from "../api/mockData";
 
@@ -10,14 +10,12 @@ interface Props {
 export function EmptyState({ onSend, loading }: Props) {
   return (
     <div className="empty-state">
-      <div className="empty-state-icon">
-        <ApartmentOutlined />
-      </div>
-      <h1>О чём спросим граф знаний?</h1>
+      <h1>
+        Это граф <span className="accent-underline">знаний</span>!
+      </h1>
       <p>
-        Отвечаю на вопросы по металлургии и обогащению руд, опираясь на граф знаний,
-        извлечённый из научных источников. Каждый ответ приходит с вершинами графа
-        и публикациями, на которые он опирается.
+        Отвечаем на вопросы по металлургии и показываем, откуда взят ответ —
+        вершины графа и статьи-источники.
       </p>
 
       <ChatInput onSend={onSend} loading={loading} large />

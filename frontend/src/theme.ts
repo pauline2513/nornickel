@@ -49,6 +49,9 @@ export const antdTheme: ThemeConfig = {
     lineWidth: 1,
     fontFamily: FONT_FAMILY,
     fontSize: 14.5,
+    boxShadow: "none",
+    boxShadowSecondary: "none",
+    boxShadowTertiary: "none",
   },
   components: {
     Button: {
@@ -66,7 +69,7 @@ export const antdTheme: ThemeConfig = {
     Input: {
       hoverBorderColor: palette.violet,
       activeBorderColor: palette.violet,
-      activeShadow: "0 0 0 3px rgba(83, 2, 224, 0.14)",
+      activeShadow: "none",
       lineWidth: 1.5,
     },
     Tag: {

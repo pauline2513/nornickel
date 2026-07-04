@@ -1,5 +1,8 @@
 import { Button } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { FilePptOutlined, GithubOutlined, PlusOutlined } from "@ant-design/icons";
+
+const REPO_URL = "https://github.com/pauline2513/nornickel";
+const PITCH_URL = "#";
 
 interface Props {
   onNewChat: () => void;
@@ -10,7 +13,7 @@ interface Props {
 function GraphMark() {
   return (
     <svg width="34" height="34" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect width="32" height="32" rx="9" fill="url(#graph-mark-gradient)" />
+      <rect width="32" height="32" rx="9" fill="var(--violet)" />
       <path
         d="M11 12 L21 21 M11 12 L22 10"
         stroke="#fff"
@@ -21,12 +24,6 @@ function GraphMark() {
       <circle cx="11" cy="12" r="3.2" fill="#fff" />
       <circle cx="22" cy="10" r="2.4" fill="#fff" opacity="0.9" />
       <circle cx="21" cy="21" r="3.6" fill="#fff" />
-      <defs>
-        <linearGradient id="graph-mark-gradient" x1="0" y1="0" x2="32" y2="32" gradientUnits="userSpaceOnUse">
-          <stop stopColor="var(--violet)" />
-          <stop offset="1" stopColor="var(--violet-dark)" />
-        </linearGradient>
-      </defs>
     </svg>
   );
 }
@@ -35,11 +32,11 @@ export function Sidebar({ onNewChat, hasMessages, loading }: Props) {
   return (
     <aside className="app-sidebar">
       <div className="sidebar-header">
-        <div className="sidebar-mark">
+        <button className="sidebar-mark" onClick={onNewChat} type="button" aria-label="Новый диалог">
           <GraphMark />
-        </div>
+        </button>
         <div className="sidebar-eyebrow">Норникель AI Science Hack</div>
-        <div className="sidebar-team">MISIS_MSc</div>
+        <div className="sidebar-team">Команда MISIS_MSc</div>
         <span className="sidebar-track-badge">Трек «Научный клубок»</span>
       </div>
 
@@ -54,6 +51,20 @@ export function Sidebar({ onNewChat, hasMessages, loading }: Props) {
       </Button>
 
       <div className="sidebar-spacer" />
+
+      <div className="sidebar-footer">
+        <a className="sidebar-footer-link" href={PITCH_URL}>
+          <FilePptOutlined /> Питч
+        </a>
+        <a
+          className="sidebar-footer-link"
+          href={REPO_URL}
+          target="_blank"
+          rel="noreferrer"
+        >
+          <GithubOutlined /> Репозиторий
+        </a>
+      </div>
     </aside>
   );
 }
