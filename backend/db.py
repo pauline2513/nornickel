@@ -38,6 +38,13 @@ RETURN elementId(node)  AS id,
        node.embedding   AS embedding
 """
 
+_NOT_DESCRIBED_ONLY = """
+NOT (
+    count { (node)--() } = 1
+    AND count { (node)-[:DESCRIBED_IN]-() } = 1
+)
+"""
+
 def fulltext_search(term, limit=None):
     words = [w for w in term.split() if w]
     if not words:
@@ -45,7 +52,9 @@ def fulltext_search(term, limit=None):
     fuzzy = " ".join(f"{w}~" for w in words)
     return run(
         "CALL db.index.fulltext.queryNodes('entity_names', $q, {limit: $limit}) "
-        "YIELD node, score " + _NODE_RETURN + ", score AS ft_score",
+        "YIELD node, score "
+        f"WHERE {_NOT_DESCRIBED_ONLY} "
+        + _NODE_RETURN + ", score AS ft_score",
         q=fuzzy,
         limit=limit or config.FULLTEXT_LIMIT,
     )
@@ -56,6 +65,7 @@ def fetch_neighbors(node_ids, limit=None):
         "MATCH (n) WHERE elementId(n) IN $ids "
         "MATCH (n)-[r]-(node) "
         "WHERE NOT node:Publication AND NOT node:Chunk "
+        f"AND {_NOT_DESCRIBED_ONLY} "
         "WITH DISTINCT node LIMIT $limit " + _NODE_RETURN,
         ids=node_ids,
         limit=limit or config.NEIGHBOR_LIMIT,
