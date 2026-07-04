@@ -223,9 +223,12 @@ body {
 }
 
 .sidebar-history-item-active {
-  background: var(--violet-soft);
   border-color: transparent;
   color: var(--violet-dark);
+}
+
+.sidebar-history-item-active:hover {
+  color: var(--violet-dark) !important;
 }
 
 .sidebar-history-item-active::before {
