@@ -1,16 +1,3 @@
-"""Загрузка предиктов Label Studio (*.pred.json) в Neo4j.
-
-- Имена сущностей приводятся к каноничному виду (лемматизация), сырые
-  написания копятся в aliases -> дубли схлопываются при MERGE.
-- Property-утверждения мёржатся по hash(text).
-- Каждой вершине проставляется эмбеддинг BGE-M3 (для скоринга в RAG).
-- Все сущности документа получают связь DESCRIBED_IN на Publication источника.
-- Publication-спаны из разметки игнорируются: источником считается сам документ,
-  а не маркеры ссылок вроде "[1]" или "обзора" внутри текста.
-
-Запуск: python -m backend.scripts.ingest "Проблемы_выделения_элементарной_серы.pred.json"
-"""
-
 import hashlib
 import json
 import sys
@@ -20,31 +7,29 @@ from .. import config, db, embeddings
 from ..canonicalize import canonical_name
 
 
-def md5(s: str) -> str:
+def md5(s):
     return hashlib.md5(s.encode("utf-8")).hexdigest()
 
 
-def _node_key(label: str, raw: str):
-    """Ключ дедупликации вершины: (label, канон.имя) либо (label, uid=hash)."""
+def _node_key(label, raw):
     if label == "Property":
         return label, md5(raw.lower().strip())
     canon = canonical_name(raw)
     return (label, canon) if canon else (None, None)
 
 
-def _match_clause(var: str, label: str, key: str) -> tuple[str, dict]:
+def _match_clause(var, label, key):
     if label in ("Property", "Publication"):
         return f"({var}:{label} {{uid: ${var}_v}})", {f"{var}_v": key}
     return f"({var}:{label} {{name: ${var}_v}})", {f"{var}_v": key}
 
 
-def ingest_document(doc: dict) -> dict:
+def ingest_document(doc: dict):
     source_file = doc["source_file"]
     pub_uid = md5(source_file)
     title = Path(source_file).stem.replace("_", " ")
     link = (doc.get("link") or "").strip() or None
 
-    # --- Publication документа-источника ---
     db.run(
         "MERGE (p:Publication {uid: $uid}) "
         "SET p.title = coalesce(p.title, $title), p.source_file = $source_file, "
@@ -52,7 +37,6 @@ def ingest_document(doc: dict) -> dict:
         uid=pub_uid, title=title, source_file=source_file, link=link,
     )
 
-    # --- собираем сущности, дедуплицируем по каноничному ключу ---
     nodes: dict[tuple, dict] = {}
     id_to_key: dict[str, tuple] = {}
     skipped = 0
@@ -84,14 +68,12 @@ def ingest_document(doc: dict) -> dict:
         })
         node["aliases"].add(raw)
 
-    # --- эмбеддинги пачкой ---
     entity_nodes = list(nodes.values())
     if entity_nodes:
         embs = embeddings.encode([n["text"] or n["name"] for n in entity_nodes])
         for node, emb in zip(entity_nodes, embs):
             node["embedding"] = emb.tolist()
 
-    # --- запись вершин ---
     for node in nodes.values():
         aliases = sorted(node["aliases"])
         if node["label"] == "Property":
@@ -110,7 +92,6 @@ def ingest_document(doc: dict) -> dict:
                 name=node["key"], emb=node["embedding"], aliases=aliases,
             )
 
-    # --- DESCRIBED_IN документа-источника для всех сущностей ---
     for node in nodes.values():
         match, params = _match_clause("n", node["label"], node["key"])
         db.run(
@@ -119,7 +100,6 @@ def ingest_document(doc: dict) -> dict:
             pub_uid=pub_uid, **params,
         )
 
-    # --- связи из предикта ---
     rel_count = 0
     for item in doc["result"]:
         if item.get("type") != "relation":

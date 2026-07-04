@@ -95,7 +95,7 @@ def ask(query: str) -> dict:
                 "entities": terms, "used_nodes": [], "sources": []}
 
     # 3. Скоринг BGE-M3, топ-K
-    query_emb = embeddings.encode([query])[0]
+    query_emb = embeddings.encode([query], text_type="query")[0]
     ranked = embeddings.rank(query_emb, list(candidates.values()))
     used: dict[str, dict] = {n["id"]: n for n in ranked[: config.TOP_K]}
 

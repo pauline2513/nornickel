@@ -1,10 +1,3 @@
-"""Суммаризация источников через Claude API.
-
-Для каждого Publication с source_file, но без summary, ищет одноимённый
-.txt в data/ и папке проекта, суммаризирует и пишет p.summary.
-
-Запуск: python -m backend.scripts.enrich_sources
-"""
 
 from .. import config, db, llm
 

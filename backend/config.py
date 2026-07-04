@@ -17,9 +17,20 @@ NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "neo4jpass")
 NEO4J_DATABASE = os.getenv("NEO4J_DATABASE", "neo4j")
 
 
+# Основная LLM
 MODEL = os.getenv("MODEL_NAME", "qwen/qwen3.6-35b-a3b")
+MODEL_API_KEY = os.getenv("MODEL_API_KEY")
+MODEL_BASE_URL = os.getenv("MODEL_BASE_URL", "https://ai.api.cloud.yandex.net/v1")
 
+# Запасная LLM (используется, если основная недоступна)
+FALLBACK_MODEL = os.getenv("FALLBACK_MODEL_NAME")
+FALLBACK_API_KEY = os.getenv("FALLBACK_API_KEY")
+FALLBACK_BASE_URL = os.getenv("FALLBACK_BASE_URL", "https://openrouter.ai/api/v1")
+
+# Эмбеддинги: удалённая модель Yandex AI Studio, при недоступности — локальная BAAI/bge
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-m3")  # dense, 1024 dim
+EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME")  # emb://<folder_id>/text-search-doc/latest
+EMBEDDING_API_KEY = os.getenv("EMBEDDING_API_KEY")
 
 # Параметры RAG
 TOP_K = 10               # сколько вершин отдаём ЛЛМ на первом шаге
