@@ -1,11 +1,8 @@
-"""Подключение к Neo4j и все запросы чтения, которые нужны RAG-пайплайну."""
-
 from neo4j import GraphDatabase
 
 from . import config
 
 _driver = None
-
 
 def get_driver():
     global _driver
@@ -16,14 +13,12 @@ def get_driver():
     return _driver
 
 
-def run(query: str, **params) -> list[dict]:
+def run(query, **params):
     with get_driver().session(database=config.NEO4J_DATABASE) as session:
         return [r.data() for r in session.run(query, **params)]
 
 
 def apply_schema():
-    """Применяет constraints/индексы из schema.cypher (идемпотентно).
-    Сначала вырезает //-комментарии, потом режет на statements по ';'."""
     no_comments = "\n".join(
         line.split("//", 1)[0]
         for line in config.SCHEMA_FILE.read_text(encoding="utf-8").splitlines()
@@ -33,21 +28,17 @@ def apply_schema():
             run(stmt.strip())
 
 
-# --------------------------------------------------------------------------
-# Чтение для RAG
-# --------------------------------------------------------------------------
-
 _NODE_RETURN = """
 RETURN elementId(node)  AS id,
        labels(node)[0]  AS label,
        node.name        AS name,
        node.text        AS text,
+       node.start       AS start,
+       node.end         AS end,
        node.embedding   AS embedding
 """
 
-
-def fulltext_search(term: str, limit: int | None = None) -> list[dict]:
-    """Fuzzy-поиск вершин по имени через полнотекстовый индекс entity_names."""
+def fulltext_search(term, limit=None):
     words = [w for w in term.split() if w]
     if not words:
         return []
@@ -60,9 +51,7 @@ def fulltext_search(term: str, limit: int | None = None) -> list[dict]:
     )
 
 
-def fetch_neighbors(node_ids: list[str], limit: int | None = None) -> list[dict]:
-    """Соседние вершины-сущности (шаг вглубь графа). Публикации не берём —
-    они попадают в ответ отдельно, как источники."""
+def fetch_neighbors(node_ids, limit=None):
     return run(
         "MATCH (n) WHERE elementId(n) IN $ids "
         "MATCH (n)-[r]-(node) "
@@ -73,8 +62,7 @@ def fetch_neighbors(node_ids: list[str], limit: int | None = None) -> list[dict]
     )
 
 
-def fetch_triples(node_ids: list[str]) -> list[dict]:
-    """Связи между выбранными вершинами — контекст структуры графа для ЛЛМ."""
+def fetch_triples(node_ids):
     return run(
         "MATCH (a)-[r]->(b) "
         "WHERE elementId(a) IN $ids AND elementId(b) IN $ids "
@@ -84,25 +72,25 @@ def fetch_triples(node_ids: list[str]) -> list[dict]:
     )
 
 
-def fetch_publications_with_summary() -> list[dict]:
-    """Все публикации с кратким содержанием — для ветки "вопрос про источники"."""
+def fetch_publications_with_summary():
     return run(
         "MATCH (p:Publication) "
         "WHERE p.summary IS NOT NULL AND p.source_file IS NOT NULL "
         "RETURN p.uid AS uid, p.title AS title, p.year AS year, "
         "       p.source_type AS source_type, p.country AS country, "
+        "       p.actualization_date AS actualization_date, "
         "       p.summary AS summary, p.link AS link"
     )
 
 
-def fetch_sources(node_ids: list[str]) -> list[dict]:
-    """Публикации-источники использованных вершин (через DESCRIBED_IN)."""
+def fetch_sources(node_ids):
     return run(
         "MATCH (n) WHERE elementId(n) IN $ids "
         "MATCH (n)-[:DESCRIBED_IN]->(p:Publication) "
         "WHERE p.source_file IS NOT NULL "
         "RETURN DISTINCT p.uid AS uid, p.title AS title, p.year AS year, "
         "       p.source_type AS source_type, p.country AS country, "
+        "       p.actualization_date AS actualization_date, "
         "       p.summary AS summary, p.link AS link, "
         "       count { (m)-[:DESCRIBED_IN]->(p) WHERE elementId(m) IN $ids } AS used_nodes_count "
         "ORDER BY used_nodes_count DESC",

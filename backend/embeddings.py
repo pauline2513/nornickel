@@ -1,20 +1,15 @@
-"""Эмбеддинги: Yandex AI Studio (text-search-doc/query), при недоступности —
-локальная BAAI/bge-m3 (dense, 1024 измерения, нормированные).
-Бэкенд выбирается один раз при первом обращении; локальная модель грузится
-лениво (~2.3 ГБ при первом запуске)."""
 import numpy as np
 import requests
 from . import config, db
 
 _local_model = None
-_backend = None  # "yandex" | "local"
+_backend = None 
 
 YANDEX_EMBED_URL = "https://ai.api.cloud.yandex.net/foundationModels/v1/textEmbedding"
 
 
 def _auth_header():
     key = config.EMBEDDING_API_KEY
-    # IAM-токены начинаются с "t1.", API-ключи передаются как Api-Key
     if key.startswith("t1."):
         return {"Authorization": f"Bearer {key}"}
     return {"Authorization": f"Api-Key {key}"}
@@ -56,11 +51,10 @@ def _choose_backend() -> str:
         try:
             _yandex_embed("проверка доступности", "doc")
             _backend = "yandex"
-            print(f"[embeddings] использую {config.EMBEDDING_MODEL_NAME}")
             return _backend
         except Exception as e:
             print(f"[embeddings] Yandex недоступен ({type(e).__name__}: {e}), "
-                  f"использую локальную {config.EMBEDDING_MODEL}")
+                  f"использую локальную")
     _backend = "local"
     return _backend
 
@@ -82,13 +76,11 @@ def rank(query_embedding, nodes):
     if not nodes:
         return []
     dim = len(query_embedding)
-    # пересчитываем и отсутствующие, и посчитанные другим бэкендом (другая размерность)
     missing = [n for n in nodes if not n.get("embedding") or len(n["embedding"]) != dim]
     if missing:
         embs = encode([n.get("text") or n["name"] for n in missing])
         for node, emb in zip(missing, embs):
             node["embedding"] = emb.tolist()
-        # сохраняем пересчитанные эмбеддинги в БД, чтобы не считать их заново
         updates = [{"id": n["id"], "embedding": n["embedding"]}
                    for n in missing if n.get("id")]
         if updates:

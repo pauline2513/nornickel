@@ -29,12 +29,17 @@ def ingest_document(doc: dict):
     pub_uid = md5(source_file)
     title = Path(source_file).stem.replace("_", " ")
     link = (doc.get("link") or "").strip() or None
+    country = (str(doc.get("country") or "")).strip() or None
+    actualization_date = (str(doc.get("actualization_date") or "")).strip() or None
 
     db.run(
         "MERGE (p:Publication {uid: $uid}) "
         "SET p.title = coalesce(p.title, $title), p.source_file = $source_file, "
-        "    p.link = coalesce($link, p.link)",
+        "    p.link = coalesce($link, p.link), "
+        "    p.country = coalesce($country, p.country), "
+        "    p.actualization_date = coalesce($actualization_date, p.actualization_date)",
         uid=pub_uid, title=title, source_file=source_file, link=link,
+        country=country, actualization_date=actualization_date,
     )
 
     nodes: dict[tuple, dict] = {}
@@ -64,6 +69,8 @@ def ingest_document(doc: dict):
             "key": key,
             "name": key if label_key != "Property" else raw,
             "text": raw if label_key == "Property" else None,
+            "start": value.get("start"),
+            "end": value.get("end"),
             "aliases": set(),
         })
         node["aliases"].add(raw)
@@ -80,16 +87,20 @@ def ingest_document(doc: dict):
             db.run(
                 "MERGE (n:Property {uid: $uid}) "
                 "SET n.name = $name, n.text = $text, n.embedding = $emb, "
+                "    n.start = $start, n.end = $end, "
                 "    n.aliases = apoc.coll.toSet(coalesce(n.aliases, []) + $aliases)",
                 uid=node["key"], name=node["text"], text=node["text"],
-                emb=node["embedding"], aliases=aliases,
+                emb=node["embedding"], start=node["start"], end=node["end"],
+                aliases=aliases,
             )
         else:
             db.run(
                 f"MERGE (n:{node['label']} {{name: $name}}) "
                 "SET n.embedding = $emb, "
+                "    n.start = $start, n.end = $end, "
                 "    n.aliases = apoc.coll.toSet(coalesce(n.aliases, []) + $aliases)",
-                name=node["key"], emb=node["embedding"], aliases=aliases,
+                name=node["key"], emb=node["embedding"],
+                start=node["start"], end=node["end"], aliases=aliases,
             )
 
     for node in nodes.values():
