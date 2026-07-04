@@ -22,6 +22,7 @@ export interface Source {
   source_type?: string | null;
   country?: string | null;
   summary?: string | null;
+  link?: string | null;
   used_nodes_count: number;
 }
 

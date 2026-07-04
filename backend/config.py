@@ -2,6 +2,10 @@ import os
 from pathlib import Path
 
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+from dotenv import load_dotenv
+load_dotenv(PROJECT_ROOT / ".env")
+
 DATA_DIR = PROJECT_ROOT / "data"
 SCHEMA_FILE = PROJECT_ROOT / "schema.cypher"
 FRONTEND_DIR = PROJECT_ROOT / "frontend" / "dist"  # собирается: cd frontend && npm run build
@@ -12,14 +16,14 @@ NEO4J_USER = os.getenv("NEO4J_USER", "neo4j")
 NEO4J_PASSWORD = os.getenv("NEO4J_PASSWORD", "neo4jpass")
 NEO4J_DATABASE = os.getenv("NEO4J_DATABASE", "neo4j")
 
-# LLM (Claude API, ключ — в переменной окружения ANTHROPIC_API_KEY)
-ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-opus-4-8")
 
-# Эмбеддинги
+MODEL = os.getenv("MODEL_NAME", "qwen/qwen3.6-35b-a3b")
+
 EMBEDDING_MODEL = os.getenv("EMBEDDING_MODEL", "BAAI/bge-m3")  # dense, 1024 dim
 
 # Параметры RAG
 TOP_K = 10               # сколько вершин отдаём ЛЛМ на первом шаге
+SOURCE_TOP_K = 5         # сколько публикаций отдаём ЛЛМ в ветке "вопрос про источники"
 FULLTEXT_LIMIT = 25      # кандидатов на один поисковый термин
 MAX_EXPANSIONS = 2       # сколько раз можно "идти вглубь", если ЛЛМ мало контекста
 NEIGHBOR_LIMIT = 60      # максимум соседей за одно расширение

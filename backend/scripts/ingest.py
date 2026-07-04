@@ -5,7 +5,6 @@
 - Property и Publication-упоминания мёржатся по hash(text).
 - Каждой вершине проставляется эмбеддинг BGE-M3 (для скоринга в RAG).
 - Все сущности документа получают связь DESCRIBED_IN на Publication источника.
-- Связи создаются с confidence = score из предикта.
 
 Запуск: python -m backend.scripts.ingest "Проблемы_выделения_элементарной_серы.pred.json"
 """
@@ -43,12 +42,14 @@ def ingest_document(doc: dict) -> dict:
     source_file = doc["source_file"]
     pub_uid = md5(source_file)
     title = Path(source_file).stem.replace("_", " ")
+    link = (doc.get("link") or "").strip() or None
 
     # --- Publication документа-источника ---
     db.run(
         "MERGE (p:Publication {uid: $uid}) "
-        "SET p.title = coalesce(p.title, $title), p.source_file = $source_file",
-        uid=pub_uid, title=title, source_file=source_file,
+        "SET p.title = coalesce(p.title, $title), p.source_file = $source_file, "
+        "    p.link = coalesce($link, p.link)",
+        uid=pub_uid, title=title, source_file=source_file, link=link,
     )
 
     # --- собираем сущности, дедуплицируем по каноничному ключу ---
@@ -140,9 +141,8 @@ def ingest_document(doc: dict) -> dict:
         m_b, p_b = _match_clause("b", *dst)
         db.run(
             f"MATCH {m_a} MATCH {m_b} "
-            f"MERGE (a)-[r:{rel_type}]->(b) "
-            "SET r.confidence = $score",
-            score=item.get("score"), **p_a, **p_b,
+            f"MERGE (a)-[:{rel_type}]->(b)",
+            **p_a, **p_b,
         )
         rel_count += 1
 

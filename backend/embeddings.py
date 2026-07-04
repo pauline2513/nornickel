@@ -1,29 +1,24 @@
 """Эмбеддинги BAAI/bge-m3 (dense, 1024 измерения, нормированные).
 Модель грузится лениво при первом обращении (~2.3 ГБ при первом запуске)."""
-
+from sentence_transformers import SentenceTransformer
 import numpy as np
-
 from . import config
 
-_model = None
+model = None
 
 
 def get_model():
-    global _model
-    if _model is None:
-        from sentence_transformers import SentenceTransformer
-
-        _model = SentenceTransformer(config.EMBEDDING_MODEL)
-    return _model
+    global model
+    if model is None:
+        model = SentenceTransformer(config.EMBEDDING_MODEL)
+    return model
 
 
-def encode(texts: list[str]) -> np.ndarray:
+def encode(texts):
     return get_model().encode(list(texts), normalize_embeddings=True)
 
 
-def rank(query_embedding: np.ndarray, nodes: list[dict]) -> list[dict]:
-    """Проставляет nodes[i]['score'] = косинусная близость к запросу и сортирует по убыванию.
-    Вершины без сохранённого эмбеддинга дозакодируются на лету по имени."""
+def rank(query_embedding, nodes):
     if not nodes:
         return []
     missing = [n for n in nodes if not n.get("embedding")]

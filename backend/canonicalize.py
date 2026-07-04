@@ -20,7 +20,6 @@ def _get_morph():
     return _morph
 
 
-@lru_cache(maxsize=100_000)
 def _lemma(word: str) -> str:
     return _get_morph().parse(word)[0].normal_form
 

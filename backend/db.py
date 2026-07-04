@@ -84,6 +84,16 @@ def fetch_triples(node_ids: list[str]) -> list[dict]:
     )
 
 
+def fetch_publications_with_summary() -> list[dict]:
+    """Все публикации с кратким содержанием — для ветки "вопрос про источники"."""
+    return run(
+        "MATCH (p:Publication) WHERE p.summary IS NOT NULL "
+        "RETURN p.uid AS uid, p.title AS title, p.year AS year, "
+        "       p.source_type AS source_type, p.country AS country, "
+        "       p.summary AS summary, p.link AS link"
+    )
+
+
 def fetch_sources(node_ids: list[str]) -> list[dict]:
     """Публикации-источники использованных вершин (через DESCRIBED_IN)."""
     return run(
@@ -91,7 +101,7 @@ def fetch_sources(node_ids: list[str]) -> list[dict]:
         "MATCH (n)-[:DESCRIBED_IN]->(p:Publication) "
         "RETURN DISTINCT p.uid AS uid, p.title AS title, p.year AS year, "
         "       p.source_type AS source_type, p.country AS country, "
-        "       p.summary AS summary, "
+        "       p.summary AS summary, p.link AS link, "
         "       count { (m)-[:DESCRIBED_IN]->(p) WHERE elementId(m) IN $ids } AS used_nodes_count "
         "ORDER BY used_nodes_count DESC",
         ids=node_ids,

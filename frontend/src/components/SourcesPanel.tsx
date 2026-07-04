@@ -22,7 +22,15 @@ export function SourcesPanel({ sources }: { sources: Source[] }) {
             <div className="source-list">
               {sources.map((s) => (
                 <div className="source-card" key={s.uid}>
-                  <div className="source-title">{s.title || s.uid}</div>
+                  <div className="source-title">
+                    {s.link ? (
+                      <a href={s.link} target="_blank" rel="noreferrer">
+                        {s.title || s.uid}
+                      </a>
+                    ) : (
+                      s.title || s.uid
+                    )}
+                  </div>
                   <div className="source-tags">
                     {s.source_type && <Tag className="source-tag-type">{s.source_type}</Tag>}
                     {s.year != null && <Tag className="source-tag-year">{s.year}</Tag>}
