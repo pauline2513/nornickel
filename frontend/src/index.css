@@ -201,8 +201,8 @@ body {
   position: absolute;
   left: -0.2em;
   right: -0.6em;
-  top: -0.02em;
-  bottom: -0.12em;
+  top: 0.02em;
+  bottom: -0.08em;
   z-index: -1;
   mix-blend-mode: multiply;
   background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20200%2060'%20preserveAspectRatio='none'%3E%3Cpath%20d='M1%2032%20L12%206%20L189%201%20L199%2027%20L187%2054%20L9%2059%20Z'%20fill='%2300FFBF'%20opacity='0.75'/%3E%3C/svg%3E");
