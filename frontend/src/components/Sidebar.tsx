@@ -32,10 +32,15 @@ export function Sidebar({ onNewChat, hasMessages, loading }: Props) {
   return (
     <aside className="app-sidebar">
       <div className="sidebar-header">
-        <button className="sidebar-mark" onClick={onNewChat} type="button" aria-label="Новый диалог">
-          <GraphMark />
-        </button>
-        <div className="sidebar-eyebrow">Норникель AI Science Hack</div>
+        <div className="sidebar-brand">
+          <button className="sidebar-mark" onClick={onNewChat} type="button" aria-label="Новый диалог">
+            <GraphMark />
+          </button>
+          <div className="sidebar-hackathon-title" aria-label="Норникель AI Science Hack">
+            <span>Норникель</span>
+            <span>AI Science Hack</span>
+          </div>
+        </div>
         <div className="sidebar-team">Команда MISIS_MSc</div>
         <span className="sidebar-track-badge">Трек «Научный клубок»</span>
       </div>

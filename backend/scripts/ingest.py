@@ -2,9 +2,11 @@
 
 - Имена сущностей приводятся к каноничному виду (лемматизация), сырые
   написания копятся в aliases -> дубли схлопываются при MERGE.
-- Property и Publication-упоминания мёржатся по hash(text).
+- Property-утверждения мёржатся по hash(text).
 - Каждой вершине проставляется эмбеддинг BGE-M3 (для скоринга в RAG).
 - Все сущности документа получают связь DESCRIBED_IN на Publication источника.
+- Publication-спаны из разметки игнорируются: источником считается сам документ,
+  а не маркеры ссылок вроде "[1]" или "обзора" внутри текста.
 
 Запуск: python -m backend.scripts.ingest "Проблемы_выделения_элементарной_серы.pred.json"
 """
@@ -26,8 +28,6 @@ def _node_key(label: str, raw: str):
     """Ключ дедупликации вершины: (label, канон.имя) либо (label, uid=hash)."""
     if label == "Property":
         return label, md5(raw.lower().strip())
-    if label == "Publication":
-        return label, md5(canonical_name(raw) or raw.lower().strip())
     canon = canonical_name(raw)
     return (label, canon) if canon else (None, None)
 
@@ -56,6 +56,7 @@ def ingest_document(doc: dict) -> dict:
     nodes: dict[tuple, dict] = {}
     id_to_key: dict[str, tuple] = {}
     skipped = 0
+    skipped_publication_spans = 0
     for item in doc["result"]:
         if item.get("type") == "relation":
             continue
@@ -63,7 +64,10 @@ def ingest_document(doc: dict) -> dict:
         raw = (value.get("text") or "").strip()
         labels = value.get("labels") or []
         label = labels[0] if labels else None
-        if not raw or label not in config.ENTITY_LABELS | {"Publication"}:
+        if label == "Publication":
+            skipped_publication_spans += 1
+            continue
+        if not raw or label not in config.ENTITY_LABELS:
             skipped += 1
             continue
         label_key, key = _node_key(label, raw)
@@ -74,14 +78,14 @@ def ingest_document(doc: dict) -> dict:
         node = nodes.setdefault((label_key, key), {
             "label": label_key,
             "key": key,
-            "name": key if label_key not in ("Property", "Publication") else raw,
+            "name": key if label_key != "Property" else raw,
             "text": raw if label_key == "Property" else None,
             "aliases": set(),
         })
         node["aliases"].add(raw)
 
     # --- эмбеддинги пачкой ---
-    entity_nodes = [n for n in nodes.values() if n["label"] != "Publication"]
+    entity_nodes = list(nodes.values())
     if entity_nodes:
         embs = embeddings.encode([n["text"] or n["name"] for n in entity_nodes])
         for node, emb in zip(entity_nodes, embs):
@@ -90,14 +94,7 @@ def ingest_document(doc: dict) -> dict:
     # --- запись вершин ---
     for node in nodes.values():
         aliases = sorted(node["aliases"])
-        if node["label"] == "Publication":
-            db.run(
-                "MERGE (n:Publication {uid: $uid}) "
-                "SET n.title = coalesce(n.title, $name), "
-                "    n.aliases = apoc.coll.toSet(coalesce(n.aliases, []) + $aliases)",
-                uid=node["key"], name=node["name"], aliases=aliases,
-            )
-        elif node["label"] == "Property":
+        if node["label"] == "Property":
             db.run(
                 "MERGE (n:Property {uid: $uid}) "
                 "SET n.name = $name, n.text = $text, n.embedding = $emb, "
@@ -115,8 +112,6 @@ def ingest_document(doc: dict) -> dict:
 
     # --- DESCRIBED_IN документа-источника для всех сущностей ---
     for node in nodes.values():
-        if node["label"] == "Publication":
-            continue
         match, params = _match_clause("n", node["label"], node["key"])
         db.run(
             f"MATCH {match} MATCH (p:Publication {{uid: $pub_uid}}) "
@@ -151,6 +146,7 @@ def ingest_document(doc: dict) -> dict:
         "nodes": len(nodes),
         "relations": rel_count,
         "skipped_spans": skipped,
+        "skipped_publication_spans": skipped_publication_spans,
     }
 
 
@@ -169,7 +165,8 @@ def main():
         for doc in docs:
             stats = ingest_document(doc)
             print(f"[ok] {stats['source']}: вершин {stats['nodes']}, "
-                  f"связей {stats['relations']}, пропущено спанов {stats['skipped_spans']}")
+                  f"связей {stats['relations']}, пропущено спанов {stats['skipped_spans']}, "
+                  f"publication-спанов {stats['skipped_publication_spans']}")
 
     total = db.run("MATCH (n) RETURN count(n) AS c")[0]["c"]
     rels = db.run("MATCH ()-[r]->() RETURN count(r) AS c")[0]["c"]

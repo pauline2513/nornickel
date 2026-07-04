@@ -87,7 +87,8 @@ def fetch_triples(node_ids: list[str]) -> list[dict]:
 def fetch_publications_with_summary() -> list[dict]:
     """Все публикации с кратким содержанием — для ветки "вопрос про источники"."""
     return run(
-        "MATCH (p:Publication) WHERE p.summary IS NOT NULL "
+        "MATCH (p:Publication) "
+        "WHERE p.summary IS NOT NULL AND p.source_file IS NOT NULL "
         "RETURN p.uid AS uid, p.title AS title, p.year AS year, "
         "       p.source_type AS source_type, p.country AS country, "
         "       p.summary AS summary, p.link AS link"
@@ -99,6 +100,7 @@ def fetch_sources(node_ids: list[str]) -> list[dict]:
     return run(
         "MATCH (n) WHERE elementId(n) IN $ids "
         "MATCH (n)-[:DESCRIBED_IN]->(p:Publication) "
+        "WHERE p.source_file IS NOT NULL "
         "RETURN DISTINCT p.uid AS uid, p.title AS title, p.year AS year, "
         "       p.source_type AS source_type, p.country AS country, "
         "       p.summary AS summary, p.link AS link, "
