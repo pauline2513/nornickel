@@ -1,0 +1,11 @@
+.git
+.venv
+.claude
+__pycache__
+**/__pycache__
+frontend/node_modules
+frontend/dist
+data
+.env
+*.pred.json
+gt_new_clean.json

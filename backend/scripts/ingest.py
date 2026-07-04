@@ -144,15 +144,15 @@ def ingest_document(doc: dict):
 def main():
     paths = [Path(p) for p in sys.argv[1:]]
     if not paths:
-        paths = sorted(config.PROJECT_ROOT.glob("*.pred.json")) + \
-                sorted(config.DATA_DIR.glob("*.pred.json"))
+        paths = sorted(config.DATA_DIR.glob("*.json"))
     if not paths:
-        print("Не найдено *.pred.json (укажите путь аргументом)")
+        print("Не найдено *.json (укажите путь аргументом)")
         return
 
     db.apply_schema()
     for path in paths:
         docs = json.loads(path.read_text(encoding="utf-8"))
+        print(len(docs))
         for doc in docs:
             stats = ingest_document(doc)
             print(f"[ok] {stats['source']}: вершин {stats['nodes']}, "

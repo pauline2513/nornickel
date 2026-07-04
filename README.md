@@ -30,17 +30,93 @@
     └── dist/                  production-сборка (npm run build), её раздаёт backend/main.py
 ```
 
-## Запуск
+## Деплой на сервер (Docker)
+
+### 1. Установить Docker (один раз на сервер)
+
+```bash
+curl -fsSL https://get.docker.com | sh
+docker compose version   # проверка, что docker и compose-плагин на месте
+```
+
+### 2. Склонировать проект
+
+Данные (`*.pred.json` для графа и `*.txt` для саммари) уже лежат в `data/` репозитория.
+
+```bash
+git clone <repo-url> nornickel-rag
+cd nornickel-rag
+```
+
+### 3. Создать .env в корне проекта
+
+```bash
+nano .env
+```
+
+```ini
+# Основная LLM (Yandex AI Studio, OpenAI-совместимый API)
+MODEL_NAME=...
+MODEL_API_KEY=...
+
+# Запасная LLM (используется при недоступности основной)
+FALLBACK_MODEL_NAME=...
+FALLBACK_API_KEY=...
+FALLBACK_BASE_URL=https://openrouter.ai/api/v1   # если запасная не на OpenRouter — поменять
+
+# Эмбеддинги Yandex (при недоступности — локальная BAAI/bge-m3)
+EMBEDDING_MODEL_NAME=emb://<folder_id>/text-search-doc/latest
+EMBEDDING_API_KEY=...
+
+# Пароль Neo4j — должен совпадать с NEO4J_AUTH в docker-compose.yaml
+NEO4J_PASSWORD=neo4jpass
+```
+
+### 4. Собрать и запустить
+
+```bash
+docker compose up -d --build
+```
+
+Первый запуск делает всё сам (5–15 минут, только в первый раз):
+- сборка образа: фронтенд (npm), python-зависимости (fastapi, neo4j, openai,
+  torch CPU, sentence-transformers — из `requirements-docker.txt` и `Dockerfile`);
+- старт Neo4j (данные — в volume `rag_nornickel_neo4jdata`);
+- `prestart` внутри контейнера: скачивает веса BAAI/bge-m3 (~2.3 ГБ,
+  в volume `rag_nornickel_hf_cache` — при перезапусках не перекачиваются),
+  при пустом графе прогоняет ingest по `data/*.json`, затем суммаризирует
+  источники (enrich_sources);
+- поднимается API + фронтенд.
+
+### 5. Проверить
+
+```bash
+curl http://localhost:8000/api/health   # {"status":"ok","nodes_in_graph":<не 0>}
+docker compose logs -f backend          # логи инициализации и RAG
+```
+
+Приложение: http://<сервер>:8000, Neo4j Browser: http://<сервер>:7475.
+
+### Полезные команды
+
+```bash
+docker compose up -d --build            # обновить после git pull
+docker compose exec backend python -m backend.scripts.ingest          # перезалить граф
+docker compose exec backend python -m backend.scripts.enrich_sources  # досуммаризировать
+docker compose down                     # остановить (данные в volume останутся)
+docker compose down -v                  # остановить и стереть данные
+```
+
+## Локальный запуск (разработка)
 
 ```powershell
 # 1. БД
-docker compose up -d
+docker compose up -d neo4j
 
 # 2. Зависимости (в venv)
 pip install -r requirements.txt
 
-# 3. Ключ Claude API
-$env:ANTHROPIC_API_KEY = "sk-ant-..."
+# 3. Ключи моделей — в .env (MODEL_NAME/MODEL_API_KEY, FALLBACK_*, EMBEDDING_*)
 
 # 4. Загрузка извлечений в граф (применит schema.cypher, при первом запуске скачает bge-m3)
 python -m backend.scripts.ingest "Проблемы_выделения_элементарной_серы.pred.json"
