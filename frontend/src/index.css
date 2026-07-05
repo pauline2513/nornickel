@@ -344,6 +344,46 @@ body {
   flex-direction: column;
 }
 
+.dataset-notice-trigger {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  z-index: 1000;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1.5px solid var(--gray);
+  border-radius: 50%;
+  background: var(--panel);
+  color: var(--ink-muted);
+  font-size: 13px;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background-color 0.15s ease;
+}
+
+.dataset-notice-trigger:hover {
+  border-color: var(--violet);
+  background: var(--violet-soft);
+  color: var(--violet-dark);
+}
+
+.dataset-notice-ok.ant-btn-primary {
+  background: var(--violet) !important;
+  border-color: var(--violet) !important;
+  color: #fff !important;
+}
+
+.dataset-notice-ok.ant-btn-primary:hover {
+  background: var(--violet-dark) !important;
+  border-color: var(--violet-dark) !important;
+}
+
 .graph-view {
   flex: 1;
   min-height: 0;

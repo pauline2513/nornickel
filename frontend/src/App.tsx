@@ -4,6 +4,7 @@ import { EmptyState } from "./components/EmptyState";
 import { ChatWindow } from "./components/ChatWindow";
 import { GraphView } from "./components/GraphView";
 import { DatasetView } from "./components/DatasetView";
+import { DatasetNotice } from "./components/DatasetNotice";
 import { askChat } from "./api/chat";
 import type { ChatConversation, ChatMessage } from "./types";
 
@@ -156,6 +157,7 @@ function App() {
 
   return (
     <div className="app-shell">
+      <DatasetNotice />
       <Sidebar
         activeConversationId={activeConversationId}
         conversations={conversations}
