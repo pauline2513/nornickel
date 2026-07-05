@@ -147,7 +147,7 @@ export function Sidebar({
 
       <div className="sidebar-footer">
         <a className="sidebar-footer-link" href={PITCH_URL}>
-          <FilePptOutlined /> Питч
+          <FilePptOutlined /> Презентация
         </a>
         <a
           className="sidebar-footer-link"
