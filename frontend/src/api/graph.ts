@@ -14,7 +14,9 @@ export async function fetchGraph(searchQuery = ""): Promise<GraphResponse> {
   try {
     response = await fetch(`/api/graph?${params.toString()}`);
   } catch {
-    throw new Error("Не удалось подключиться к backend. Проверьте, что сервер запущен.");
+    throw new Error(
+      "Не удалось подключиться к backend. Проверьте, что сервер запущен.",
+    );
   }
 
   if (!response.ok) {
