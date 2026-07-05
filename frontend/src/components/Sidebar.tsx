@@ -9,7 +9,7 @@ import {
 import type { ChatConversation } from "../types";
 
 const REPO_URL = "https://github.com/pauline2513/nornickel";
-const PITCH_URL = "#";
+const PITCH_URL = "https://disk.yandex.ru/i/XsDkMs80XfzZhA";
 const REQUEST_TIME_FORMATTER = new Intl.DateTimeFormat("ru-RU", {
   hour: "2-digit",
   minute: "2-digit",

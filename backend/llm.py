@@ -177,6 +177,7 @@ def generate_answer(query, context):
             "top_k": 20,
             "chat_template_kwargs": {"enable_thinking": False},
         },
+        max_completion_tokens=10000
     ))
     print(response.choices[0].message.content)
     return response.choices[0].message.content

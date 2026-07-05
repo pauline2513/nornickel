@@ -28,10 +28,10 @@ EMBEDDING_MODEL_NAME = os.getenv("EMBEDDING_MODEL_NAME")
 EMBEDDING_API_KEY = os.getenv("EMBEDDING_API_KEY")
 
 TOP_K = 10         
-SOURCE_TOP_K = 5
+SOURCE_TOP_K = 10
 FULLTEXT_LIMIT = 25
-MAX_EXPANSIONS = 2
-NEIGHBOR_LIMIT = 60
+MAX_EXPANSIONS = 5
+NEIGHBOR_LIMIT = 10
 
 ENTITY_LABELS = {"Material", "Process", "Equipment", "Property",
                  "Experiment", "Expert", "Facility"}

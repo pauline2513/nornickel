@@ -49,7 +49,7 @@ def _ask_about_sources(query):
                 "entities": terms, "expansions": 0, "used_nodes": [], "sources": []}
 
     ranked = _rank_publications(terms, pubs)
-    top = [p for p in ranked if p["match_score"] > 0][: config.SOURCE_TOP_K] \
+    top = [p for p in ranked if p["match_score"] >= 0][: config.SOURCE_TOP_K] \
         or ranked[: config.SOURCE_TOP_K]
 
     lines = ["Источники:"]
